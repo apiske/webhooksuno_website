@@ -1,6 +1,6 @@
 ---
 sidebar_position: 1
-title: Binding Requests
+title: Binding requests
 ---
 
 > You only need this resource for **sending webhooks**, not for receiving them!
