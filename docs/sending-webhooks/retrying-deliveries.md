@@ -50,7 +50,7 @@ and it is the time, in seconds, to wait before attempting
 delivery again.
 
 ```
-wait_time = retry_wait_factor*30 +
+wait_time = (retry_wait_factor/100)*30 +
             2**(attempt_counter*(retry_wait_factor/100)) +
             rand(60)
 ```
@@ -73,23 +73,26 @@ The following table shows the wait times for wait factors
 (denoted `f`) of 100 and 150. You can use this table as a reference
 when adjusting your values. The random factor is considered zero.
 
+To experiment with different values,
+check out [this Repl.it](https://replit.com/@andrepiske/WebhooksUnoWaitFactorCalculator).
+
 | Attempt | f=100 wait | f=100 accum time\* | f=150 wait | f=150 accum time\* |
 | ----- | -------- | -------------- | -------- | ------------- |
-| 1 | 32s | 32s | 32s | 32s |
-| 2 | 1m 4s | 1m 36s | 1m 8s | 1m 40s |
-| 3 | 1m 38s | 3m 14s | 1m 52s | 3m 32s |
-| 4 | 2m 16s | 5m 30s | 3m 4s | 6m 36s |
-| 5 | 3m 2s | 8m 32s | 5m 31s | 12m 7s |
-| 6 | 4m 4s | 12m 36s | 11m 32s | 23m 39s |
-| 7 | 5m 38s | 18m 14s | 27m 38s | 51m 17s |
-| 8 | 8m 16s | 26m 30s | 1h 12m | 2h 3m |
-| 9 | 13m 2s | 39m 32s | 3h 17m | 5h 21m |
-| 10 | 22m 4s | 1h 1m | 9h 11m | 14h 32m |
-| 11 | 39m 38s | 1h 41m | 1d 1h | 1d 16h |
-| 12 | 1h 14m | 2h 55m | 3d 0h | 4d 17h |
-| 13 | 2h 23m | 5h 18m | 8d 14h | 13d 7h |
-| 14 | 4h 40m | 9h 58m | 24d 6h | 37d 14h |
-| 15 | 9h 13m | 19h 12m | 68d 15h | 106d 5h |
+| 1 | 32s | 32s | 48s | 48s |
+| 2 | 34s | 1m 6s | 53s | 1m 41s |
+| 3 | 38s | 1m 44s | 1m 8s | 2m 49s |
+| 4 | 46s | 2m 30s | 1m 49s | 4m 38s |
+| 5 | 1m 2s | 3m 32s | 3m 47s | 8m 25s |
+| 6 | 1m 34s | 5m 6s | 9m 17s | 17m 42s |
+| 7 | 2m 38s | 7m 44s | 24m 54s | 42m 36s |
+| 8 | 4m 46s | 12m 30s | 1h 9m | 1h 51m |
+| 9 | 9m 2s | 21m 32s | 3h 13m | 5h 5m |
+| 10 | 17m 34s | 39m 6s | 9h 6m | 14h 12m |
+| 11 | 34m 38s | 1h 13m | 1d 1h | 1d 15h |
+| 12 | 1h 8m | 2h 22m | 3d 0h | 4d 16h |
+| 13 | 2h 17m | 4h 39m | 8d 13h | 13d 6h |
+| 14 | 4h 33m | 9h 13m | 24d 6h | 37d 13h |
+| 15 | 9h 6m | 18h 19m | 68d 15h | 106d 5h |
 
 The `wait` columns show the time to wait for the next retry after
 each attempt. The `accum time` shows the accumulated waited time since the
