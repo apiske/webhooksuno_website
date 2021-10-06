@@ -9,62 +9,71 @@ title: Retrying deliveries
 Sometimes the delivery of a webhook fails. This can happen due to several
 reasons. To list a few:
 
-- The consumer returned an invalid status code (like 4xx or 5xx status codes)
-- The consumer's servers are down
+- The receiver returned an invalid status code (like 4xx or 5xx status codes)
+- The receiver's servers are down
 - The DNS failed to resolve the consumer's host
-- The consumer's servers are experienced an unusual traffic spike and can't
-handle more requests
+- The receiver's servers are experienced an unusual traffic spike and
+  cannot handle more requests
 
-Any computer system can fail but that is expected. The highest priority on such
-scenarios is to not drop any webhooks in order to avoid data lost.
-
-This is achieved by having a retry mechanism in place. Webhooks.uno
-automatically retries failed deliveries.
+The highest priority on such scenarios is to not drop any webhooks in order 
+to avoid losing data. This is achieved by having a retry mechanism in place. 
+Webhooks.uno automatically retries failed deliveries by default.
 
 Nevertheless, you can control a few options of the retry mechanism
-in the WebhookDefinition object via its `retry_policy` attribute.
-
-See the documentation for [WebhookDefinition](/docs/resources/webhook-definitions)
-to learn more about webhook definitions and how they are used.
+in the
+[WebhookDefinition](/docs/resources/webhook-definitions).
 
 ## The retry mechanism
 
-As stated above, the retry mechanism is controlled by the `retry_policy`
-attribute of the WebhookDefinition object.
+When an attempt to deliver a webhook message to a receiver fails,
+the webhook message will be preserved and delivery will be performed
+again in the future. Parameters such as for how long delivery is attempted
+before being considered failed are configured by the WebhookDefinition.
 
-When a tentative to deliver a webhook to a consumer fails,
-the webhook will be preserved and will be retried in the future
-according to the retry policy of the WebhookDefinition object associated with
-the topic to which the webhook has been published.
+A WebhookDefinition is associated to a Topic object. Thus, it is possible
+to have distinct retry behaviors for individual topics.
 
-The maximum number of retries is given by the `max_retries` attribute of
-the retry policy and the time to wait between tries is controlled by the
-`wait_factor` attribute. The `failure_behavior` attribute controls what
-happens when all retry attempts fail.
+This retry mechanism is configured by two attributes of the WebhookDefinition.
+They are:
 
-The time to wait between retries is given by the following formula:
+- `retry_wait_factor` A multiplier value that controls for how long
+  and how often delivery will be retried
+- `retry_max_retries` The maximum amount of retries before considering
+  the delivery failed
+
+### Wait time
+
+The time to wait between each attempt is calculated based on the
+`retry_wait_factor` attribute. The `wait_time` is calculated by the
+equation below. This time is calculated after a delivery attempt fails
+and it is the time, in seconds, to wait before attempting
+delivery again.
 
 ```
-wait_time = wait_factor*30 + 2**(retry * (wait_factor/100)) + rand(60)
+wait_time = retry_wait_factor*30 +
+            2**(attempt_counter*(retry_wait_factor/100)) +
+            rand(60)
 ```
 
-Where:
+where:
 
-- `retry` is the retry number
-- `wait_factor` is an attribute of the `retry_policy`
-- `rand(60)` is a random factor of 0 to 60 seconds
+- `attempt_counter` is the number of the attempt
+- `retry_wait_factor` a multiplier value
+- `rand(60)` is a random factor. An integer within 0 to 59 seconds
 - `**` is the exponentiation operator
 
-The value of `retry` starts from 1 up to `max_retries`. The first delivery
-attempt is not considered a retry, which means the first retry attempt only
+The value of `attempt_counter` starts from 1 and goes up to
+`retry_max_retries`. The first delivery attempt is not considered a
+retry, which means the first retry attempt only
 occurs after the webhook delivery failed at least once.
 
-The `wait_factor` must be a value `>= 10` and `<= 200`.
+The `retry_wait_factor` must be an integer `>= 10` and `<= 200`.
 
-The following table shows the wait times for wait factors (denoted `f`) of 100 and 150, including the theoretical total wait time (see below for total wait time limitations). The random factor is not considered here as it is small
-enough.
+The following table shows the wait times for wait factors
+(denoted `f`) of 100 and 150. You can use this table as a reference
+when adjusting your values. The random factor is considered zero.
 
-| Retry | f=100 wait | f=100 total wait\* | f=150 wait | f=150 total wait\* |
+| Attempt | f=100 wait | f=100 accum time\* | f=150 wait | f=150 accum time\* |
 | ----- | -------- | -------------- | -------- | ------------- |
 | 1 | 32s | 32s | 32s | 32s |
 | 2 | 1m 4s | 1m 36s | 1m 8s | 1m 40s |
@@ -82,72 +91,30 @@ enough.
 | 14 | 4h 40m | 9h 58m | 24d 6h | 37d 14h |
 | 15 | 9h 13m | 19h 12m | 68d 15h | 106d 5h |
 
-\* The total wait in the table is the _theoretical total wait_. In reality
-they are further limited depending on your account plan. See below.
+The `wait` columns show the time to wait for the next retry after
+each attempt. The `accum time` shows the accumulated waited time since the
+first delivery was attempted.
 
-From the table above, we can see that with a `wait_factor=100`, the wait
-time from the first failed delivery to the first retry is 32 seconds
-plus a random value of 0 to 60 seconds.
-The wait time between the first retry to the second retry is of 1 minute
-and 4 seconds plus a random value of 0 to 60 seconds.
-Also, the total wait time between the first delivery attempt to the second
-retry is of 1 minute and 36 seconds plus a random value of 0 to 120 seconds.
+### Maximum retry attempts
 
-**Important**: The maximum total wait time of a webhook message is
-capped in 10 days.
+Retrying delivery forever is probably not a good idea. Thus, the
+maximum amount of attempts that will be performed is controlled by the
+`retry_max_retries` attribute.
 
-### Disabling the retry mechanism
+As an example, let's say that `retry_max_retries = 2`. In this case,
+the webhook message will be attempted once (the first time) and two
+more times (two retries).
 
-The retry mechanism can be disabled by setting the `max_retries` to zero in the
-WebhookDefinition's `retry_policy` attribute. In that case, the webhook
-will be dropped in case of a failed delivery attempt.
+If `retry_max_retries` is zero, then there will be no retries. That is,
+the initial delivery attempt will be performed. In case it fails,
+no more attempts will ever be performed.
 
-### When all retries fail: the failure\_behavior
+## Reliability considerations
 
-To control what happens when a webhook delivery is attempted several times
-but fails every one of them, the `failure_behavior` attribute of the
-`retry_policy` can be used.
+When adjusting the `retry_*` attributes of a WebhookDefinition, keep
+in mind that webhook messages that are waiting to be delivered
+are kept in the Redis database of webhooks.uno.
 
-There are two possible values for the `failure_behavior` attribute:
+Since Redis uses RAM as its storage mechanism, having long waiting times
+could mean your Redis deployment can run out of memory.
 
-- `"drop"` The webhook will be dropped
-- `"enter_failure"` The consumer will enter failure mode (see below)
-
-#### The "drop" mode
-
-In this mode, the webhook will just be dropped (i.e. deleted) and
-there is no more chance for its delivery to be retried again.
-
-**Important**: This mode implies that there will be data lost if the
-consumer is unable to receive the webhook after the maximum number of
-retries.
-
-#### The "enter\_failure" mode
-
-In this mode, the webhook will NOT be dropped (i.e. will not be deleted).
-Instead, the consumer that is failing to receive the webhooks
-will be put in the `failure` mode.
-<!--
-See the [Consumer modes](/consumer_modes) for more information.
--->
-
-This mode guarantees that no data will be lost in case of failures.
-
-## Choosing the right retry policy
-
-Since there is no "one size fits all" solution, you can tune the attributes
-of the `retry_policy` for each WebhookDefinition object, therefore being
-able to tune them for each topic.
-
-For scenarios where your published webhooks are time sentitive, meaning
-that a consumer receiving them hours or days after it was initially published,
-you are likely to be fine with low values for `wait_factor` and an
-`enter_failure` mode set to `drop`.
-
-If, on the other hand, it is vital that the webhooks are not lost along
-the way, then having higher values for `wait_factor` will better suit
-your needs. Having the `enter_failure` mode set to `enter_failure` will
-ensure that your deliveries are not lost.
-
-Having a higher `wait_factor` value gives the consumers of your webhooks
-more time to recover from issues on their infrastructure or code.
