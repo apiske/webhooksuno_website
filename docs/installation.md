@@ -23,7 +23,7 @@ Let's create a network in Docker for the deployment of webhooks.uno.
 Create it with the following command:
 
 ```
-$ docker create network uno-net
+docker network create uno-net
 ```
 
 ### Redis instance
@@ -31,7 +31,7 @@ $ docker create network uno-net
 Run a Redis instance with the following command:
 
 ```
-$ docker run --rm -ti --name uno-redis --network uno-net redis:6
+docker run -ti --name uno-redis --network uno-net redis:6
 ```
 
 ### PostgreSQL database
@@ -39,7 +39,9 @@ $ docker run --rm -ti --name uno-redis --network uno-net redis:6
 Run a PostgreSQL database instance with the following command:
 
 ```
-$ docker run --rm -ti --network uno-net \
+docker run -ti \
+  --network uno-net \
+  --name uno-db \
   -e POSTGRES_PASSWORD=muchsecret \
   -e POSTGRES_USER=unouser \
   -e POSTGRES_DB=uno \
@@ -59,7 +61,7 @@ Thus, we recommend running the following in two separate terminal windows
 (or shell sessions):
 
 ```
-$ export DATABASE_USER=unouser ; \
+export DATABASE_USER=unouser ; \
 export DATABASE_PASSWORD=muchsecret ; \
 export DATABASE_HOST=uno-db ; \
 export DATABASE_PORT=5432 ; \
@@ -74,7 +76,7 @@ In order to run the webhooks.uno workers and API server, the database must
 first be initialized. The following command will initialize the database:
 
 ```
-$ docker run --rm -ti \
+docker run --rm -ti \
   --network uno-net \
   -e DATABASE_USER=$DATABASE_USER \
   -e DATABASE_PASSWORD=$DATABASE_PASSWORD \
@@ -95,7 +97,7 @@ In order for webhooks to be dispatched, the asynchronous workers are needed.
 You can run an instance of a worker with the following command:
 
 ```
-$ docker run --rm -ti \
+docker run --rm -ti \
   --name uno-worker \
   --network uno-net \
   -e DATABASE_USER=$DATABASE_USER \
@@ -113,7 +115,7 @@ $ docker run --rm -ti \
 The following command runs the API server and exposes it on port 3005:
 
 ```
-$ docker run --rm -ti \
+docker run --rm -ti \
   --name uno-api \
   --network uno-net \
   -e DATABASE_USER=$DATABASE_USER \
@@ -171,14 +173,14 @@ to `sender`. To create a receiver workspace, set it to `receiver`.
 For instance, to create a sender workspace named `dummy-sender`, export the variable with:
 
 ```
-$ export UNO_WORKSPACE_NAME=dummy-sender
-$ export WORKSPACE_TYPE=sender
+export UNO_WORKSPACE_NAME=dummy-sender
+export WORKSPACE_TYPE=sender
 ```
 
 then run:
 
 ```
-$ docker run --rm -ti \
+docker run --rm -ti \
   --network uno-net \
   -e DATABASE_USER=$DATABASE_USER \
   -e DATABASE_PASSWORD=$DATABASE_PASSWORD \
@@ -187,7 +189,7 @@ $ docker run --rm -ti \
   -e DATABASE_NAME=$DATABASE_NAME \
   -e APP_RJOB_URL=$APP_RJOB_URL \
   -e APP_RJOB_MAX_THREADS=$APP_RJOB_MAX_THREADS \
-  -e UNO_WORKSPACE_NAME=$UNO_WORKSPACE_NAME
+  -e UNO_WORKSPACE_NAME=$UNO_WORKSPACE_NAME \
   webhooksuno/webhooksuno:latest create-$WORKSPACE_TYPE
 ```
 
