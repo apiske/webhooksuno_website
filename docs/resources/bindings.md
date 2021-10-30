@@ -5,29 +5,31 @@ title: Bindings
 
 > This documentation is focused for **webhook receivers** but is also useful for the ones **sending** them!
 
-A Binding connects a Router to the external world. This means it connects a webhook sender to those is interested
-in receiving them.
+A Binding connects to a Router object to receive webhooks messages.
 
-In order to be able to receive webhooks, you will need to create a
-[Subscription](/docs/resources/subscriptions) object. To do that, you will need to get
-a Binding instance, since a Subscription is connected to a Binding.
-
-To get a Binding instance, someone has to provide you an "Binding
-ID" or an "Binding Request ID. Once you activate it, by calling the
-binding activation API endpoint, you will have a Binding instance
-associated with your Workspace.
-
-> The terms "Binding" and "Binding Request" may be used
-interchangeably. "Binding Request" is the name from the Sender's
-perspective, while "Binding" is mostly used from the Receiver's
-perspective.
+Once a Binding is created, [Subscription](/docs/resources/subscriptions)
+objects associated to the binding can be created to start receiving
+webhook messages.
 
 ## Usage
 
-To activate a Binding, you may call the activation endpoint:
+To create a Binding, you must have a router ID in hands. This will
+likely be handed to you by the webhook sender end.
+
+Then, create the Binding using the following request:
 
 ```http
-POST <WEBHOOKS_UNO_URL>/v1/binding/activate/:binding_id
+POST <WEBHOOKS_UNO_URL>/v1/bindings
+```
+
+with the following body payload:
+
+```json
+{
+  "data": {
+    "router_id": "1d7a60ac-8268-457b-9873-21520dbfb36c"
+  }
+}
 ```
 
 An example response is as follows:
@@ -35,42 +37,30 @@ An example response is as follows:
 ```json
 {
   "data": {
-    "status": "valid",
-    "binding_id": "833d991a-00c8-45fe-9b14-49a62974313a"
+    "id": "833d991a-00c8-45fe-9b14-49a62974313a",
+    "router_id": "1d7a60ac-8268-457b-9873-21520dbfb36c",
+    "status": "active"
   }
 }
 ```
 
-If the activation is successful, the response will have the HTTP status
-code 201 and its payload data will have the `status` attribute set to
-`valid`. The `binding_id` returned in the body is always the same
-as the `binding_id` parameters in the URL.
+If creation is successful, the response will have the HTTP status
+code 201 Created.
 
-A Binding can only be activated once for a Workspace. Trying to
-activate it again will result in a response with the HTTP status code 409
-and the `status` attribute set to `used`.
-An example response body for this scenario is:
+There can be only one Binding between a Workspace and Router pair. Thus,
+performing the request above with the same parameters more than once will
+always result in a 409 Conflict HTTP status code.
 
-```json
-{
-  "data": {
-    "status": "used",
-    "message": "The binding has already been activated",
-    "binding_id": "833d991a-00c8-45fe-9b14-49a62974313a"
-  }
-}
-```
+### List available topics
 
-### List all Binding topics
-
-After a Binding is activated, you may use it to create new
+After a Binding is created, it may be used to create new
 [Subscription](/docs/resources/subscriptions) objects.
 When creating a Subscription you will have to specify which topics it will
 listen to. You may get a list of the existing topics for a given Binding
-by calling the list\_topics endpoint:
+by calling the following endpoint:
 
 ```
-GET <WEBHOOKS_UNO_URL>/v1/binding/:binding_id/list_topic
+GET <WEBHOOKS_UNO_URL>/v1/bindings/<BINDING_ID>/topics
 ```
 
 The response body will contain an array with each topic and its description.
@@ -92,3 +82,5 @@ An example response body is as follows:
   ]
 }
 ```
+
+

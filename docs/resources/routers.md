@@ -5,9 +5,10 @@ title: Routers
 
 > You only need this resource for **sending webhooks**, not for receiving them!
 
-A router is the first step in opening webhooks to the external world.
-It is the first step in the routing of webhooks to their final destinations.
-The second step are [Binding Requests](/docs/resources/binding-requests).
+A Router exposes webhook messages and topics to the external world.
+
+When a webhook message is sent to a certain topic, all routers that route
+that topic will deliver the message to its subscribers.
 
 The routing process is illustrated by the following diagram. It starts with a
 webhook being published:

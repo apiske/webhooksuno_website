@@ -11,8 +11,8 @@ This page shows the whole routing from a publish request to its delivery
 to the final destination.
 
 The following diagram summarizes the routing flow. The flow starts
-when you call the `/publish`.
-See the following sections for more details on each step.
+when the `/publish` endpoint is called.
+See the sections below for more details on each step.
 
 ![](/img/webhook_routing_1.svg)
 
@@ -32,38 +32,36 @@ The Routers that were matches then proceed to the next step.
 
 ## Step 2
 
-_Find all BindingRequests associated to the matched Routers_.
-
-The matched Routers Step 1 are the input to this step.
-Then, all [BindingRequests](/docs/resources/binding-requests) associated to
-the Routers are fetched and proceed to the next step. No further
-filtering is performed in this step.
-
-## Step 3
-
 _Find matching Subscriptions associated to the ReceiverBindings_.
 
-From the BindingRequests, it's now possible to find all Subscriptions
+From the Routers, it's now possible to find all Subscriptions
 attached to them. The entity that attaches a Subscriptions to a
-BindingRequest is called a [ReceiverBinding](/docs/resources/receiver-bindings).
+Router is called a [ReceiverBinding](/docs/resources/receiver-bindings).
 
-Additionally, for a Subscription to be matches it needs to satisfy two 
-conditions:
+> **Note**: From the receiver end perspective, the ReceiverBinding object
+> is just called Binding. It is the same object, but different attributes
+> are visible for each side.
+
+For a Subscription to be matched it has to simultaneously
+satisfy two  conditions:
 
 1. The `topic` being published must be present in its `topics` attribute
 1. The `state` attribute must be set to either `active` or `error`
 
 **Note**: It is possible for ReceiverBindings to be manually disabled by the _sender_ of webhook messages.
-Only ReceiverBindings that are not disabled are matched in this step.
-See the documentation for the resource for more information.
+Only non disabled ReceiverBindings are matched in this step.
+See [its documentation](/docs/resources/receiver-bindings) for
+more information.
 
+> **A note on the Subscription's state attribute**
+> 
 > If the `state` attribute of the Subscription is `error`, it will be matched
-> in this step. The reason is that messages will pile up while the receiving
-> end is erroring and will be delivered after the `state` attribute goes
-> back to `active`. This makes delivery reliable in case of temporary
-> failures at the receiving end.
+> in this step. The reason is so that messages can pile up while the receiving
+> end is erroring in order to be delivered after the `state` attribute goes
+> back to `active`. This allows for reliable deliveries in case of temporary
+> failures on the receiving end.
 
-## Step 4
+## Step 3
 
 _For each Subscription, create a Message_.
 
@@ -71,4 +69,16 @@ There are no conditions/filters on this step. Every Subscription entity coming
 from the last step will yield a Message resource.
 
 Each Message is then enqueued to be delivered to its destination.
+
+## Step 4
+
+_Deliver all created Messages_.
+
+All Messages created in the previous step are enqueued for delivery.
+
+When a delivery fails and is further retried
+(as in [Retrying deliveries](/docs/sending-webhooks/retrying-deliveries)),
+its delivery starts from this very step. Thus, a webhook message never goes
+through routing steps 1 to 3 more than once, but can go many times through
+step 4 until its delivery is considered either successful or failed.
 
