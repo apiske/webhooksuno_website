@@ -213,15 +213,16 @@ def lambda_handler(event:, context:)
     if valid_signature
         puts("Digest = #{payload_signature}")
         puts('The signature is good!')
-    else:
+    else
         puts('SECURITY ALERT:')
         puts('The webhook signature is invalid! This webhook will be discarded.')
+    end
     
     return {
         'statusCode': 200,
         'body': ''
     }
-    
+
     { statusCode: 200, body: "" }
 end
 ```
