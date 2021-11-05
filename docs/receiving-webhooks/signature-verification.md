@@ -104,7 +104,8 @@ relevant keys:
 The `context` attribute is not used in these examples, thus it's not 
 relevant.
 
-It's relevant to notice that they use the key `AGYJihkaUOqdg3vkzqQ4/GX0yi6XABzzEKHi/iXobDM=`. To create that key, you would perform a `POST`
+It's relevant to notice that they use the key `8RtxqPJdBuiB3nqLzc6ww0lvYrBPW7BgFp/r97sIur6cyU5Sbs+7fub6zWs2HneSy2pwx0MZH9SZRZVdg/6WxQ==`.
+To create that key, you would perform a `POST`
 request to `<WEBHOOKS_UNO_URL>/keys` with the following payload:
 
 ```json
@@ -112,7 +113,7 @@ request to `<WEBHOOKS_UNO_URL>/keys` with the following payload:
   "data": {
     "name": "some_key_name",
     "kind": "hmac_sha256",
-    "content": "AGYJihkaUOqdg3vkzqQ4/GX0yi6XABzzEKHi/iXobDM="
+    "content": "8RtxqPJdBuiB3nqLzc6ww0lvYrBPW7BgFp/r97sIur6cyU5Sbs+7fub6zWs2HneSy2pwx0MZH9SZRZVdg/6WxQ=="
   }
 }
 ```
@@ -127,7 +128,7 @@ import base64
 def lambda_handler(event, context):
     # The signing key as when used to create the Key object
     # This must be kept secret!
-    sign_key = 'AGYJihkaUOqdg3vkzqQ4/GX0yi6XABzzEKHi/iXobDM='
+    sign_key = '8RtxqPJdBuiB3nqLzc6ww0lvYrBPW7BgFp/r97sIur6cyU5Sbs+7fub6zWs2HneSy2pwx0MZH9SZRZVdg/6WxQ=='
 
     # The signing key, but in its binary form
     decoded_sign_key = base64.b64decode(sign_key)
