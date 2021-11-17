@@ -16,6 +16,7 @@ A summary:
 A few idiosyncrasies:
   
 * Resource data always sits inside a `data` attribute
+* Pagination information sits inside the `page` attribute
 * `GET` requests are safe and have no side effects (they
   never change data
 * `PUT` requests change resources and `PATCH` requests are not
@@ -54,3 +55,45 @@ This is the only method of authorization.
 
 > There is no concept of Authentication in webhooks.uno as there is
   no concept of users. There is only Authorization.
+
+## Pagination
+
+All endpoints that enumerate resources support pagination.
+
+Pagination uses opaque cursors, not page size and page number. Information
+regarding pagination comes in the `page` attribute of the root object in
+the responde body. It may contain three attributes, which are:
+
+- `has_more`, a boolean that tells whether there are more pages. If this
+  is false, there are no more pages left.
+- `size`, an integer that tells the size of the page. Note that the
+  page size is fixed and thus NOT configurable.
+- `next`, a string which is the cursor to the next page. This is only
+  present if `has_more` is true.
+
+To get the next page for a request, just pass the cursor in the `next`
+attribute in the query parameter `page`.
+
+For example, a request to the `/topics` endpoint could return something like the following:
+
+```json
+"data": {
+  ...
+},
+"page": {
+   "has_more": true,
+   "size": 50,
+   "next": "MXh8jUfa1AyRcEEjhDdeTBrPKOVmswMpiIHLzrSl0xX2"
+}
+```
+
+To get the results of the next page, you would just call the endpoint
+passing the next cursor value as a query parameter, like the following
+request:
+
+```
+GET /topics?page=MXh8jUfa1AyRcEEjhDdeTBrPKOVmswMpiIHLzrSl0xX2
+```
+
+In order to return the first page, you may either omit the `page` query
+parameter, set it to `first` or `0` or just set it to an empty value.
