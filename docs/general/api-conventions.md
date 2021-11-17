@@ -77,13 +77,15 @@ attribute in the query parameter `page`.
 For example, a request to the `/topics` endpoint could return something like the following:
 
 ```json
-"data": {
-  ...
-},
-"page": {
-   "has_more": true,
-   "size": 50,
-   "next": "MXh8jUfa1AyRcEEjhDdeTBrPKOVmswMpiIHLzrSl0xX2"
+{
+  "data": {
+    ...
+  },
+  "page": {
+    "has_more": true,
+	 "size": 50,
+	 "next": "MXh8jUfa1AyRcEEjhDdeTBrPKOVmswMpiIHLzrSl0xX2"
+  }
 }
 ```
 
