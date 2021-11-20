@@ -3,6 +3,8 @@ sidebar_position: 7
 title: Topics
 ---
 
+import { ApiEndpoints, ApiResource } from '@site/src/components/ApiDoc';
+
 > This documentation is focused for **webhook senders** but is also useful
 > for the ones **receiving** them!
 
@@ -27,25 +29,32 @@ to the topic `profile:new_follower`. Also if they would be interested
 in receiving a webhook each time a tweet is made, they would also subscribe
 to the topic `tweet:created`.
 
+## API
 
-## Topic object attributes
+<ApiEndpoints endpoints={[
+{ m: 'GET', p: '/v1/topics' },
+{ m: 'GET', p: '/v1/topics/:id' },
+{ m: 'POST', p: '/v1/topics' },
+{ m: 'PUT', p: '/v1/topics/:id' }
+]} />
 
-**id** (string)
-
-The unique identifier for this object.
-
-**name** (string)
-
-The unique name for this object.
-
-**public\_description** (string)
-
-The description to your subscribers of what is published to this topic.
-
-**webhook\_definition** (WebhookDefinition object reference)
-
-A reference to a [WebhookDefinition](/docs/resources/webhook-definitions) object.
-
-A WebhookDefinition object provides information
-such as the payload data format (e.g. JSON, XML),
-retry policies, response codes and others.
+<ApiResource data={[
+{
+  attr: "name",
+  type: "string",
+  required: true,
+  desc: "The resource unique name"
+},
+{
+  attr: "public_description",
+  type: "string",
+  required: false,
+  desc: `The description to your subscribers of what is published to this topic.`
+},
+{
+  attr: "webhook_definition",
+  type: "name|id",
+  required: true,
+  desc: `The WebhookDefinition object that determines behaviors for webhooks sent to this topic`
+}
+]} />
