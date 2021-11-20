@@ -3,6 +3,8 @@ sidebar_position: 5
 title: Subscriptions
 ---
 
+import { ApiEndpoints, ApiResource } from '@site/src/components/ApiDoc';
+
 > You only need this resource for **receiving webhooks**, not for sending them!
 
 A Subscription listens to webhook messages and delivers them to the
@@ -33,3 +35,47 @@ to this rule is when the server at `destination_url` fails to properly
 receive the request, in which case the webhook message could then be
 re-delivered multiple times until a delivery succeeds.
 See the [Retrying](/docs/sending-webhooks/retrying-deliveries) page for more information.
+
+## API
+
+<ApiEndpoints endpoints={[
+{ m: 'GET', p: '/subscriptions' },
+{ m: 'GET', p: '/subscriptions/:id' },
+{ m: 'POST', p: '/subscriptions' },
+{ m: 'PUT', p: '/subscriptions/:id' }
+]} />
+
+<ApiResource data={[
+{
+  attr: "name",
+  type: "string",
+  required: true,
+  desc: "The resource unique name"
+},
+{
+  attr: "binding",
+  type: "name|id",
+  required: true,
+  desc: `The Binding to be used as the source of webhooks`
+},
+{
+  attr: "key",
+  type: "name|id",
+  required: true,
+  desc: `The Key used to sign webhooks`
+},
+{
+  attr: "topics",
+  type: "array[name|id]",
+  required: true,
+  desc: `A list of Topics this subscription will respond to`
+},
+{
+  attr: "destination_url",
+  type: "URL",
+  required: true,
+  desc: `The URL where webhooks will be delivered to`
+}
+]} />
+
+
