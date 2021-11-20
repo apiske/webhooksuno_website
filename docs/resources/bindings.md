@@ -11,6 +11,9 @@ Once a Binding is created, [Subscription](/docs/resources/subscriptions)
 objects associated to the binding can be created to start receiving
 webhook messages.
 
+To understand more about why Subscriptions are not attached directly to Routers
+and why Bindings are necessary, see the [Why Bindings](/docs/general/why-bindings) page.
+
 ## Usage
 
 To create a Binding, you must have a router ID in hands. This will
