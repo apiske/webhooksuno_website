@@ -39,10 +39,10 @@ See the [Retrying](/docs/sending-webhooks/retrying-deliveries) page for more inf
 ## API
 
 <ApiEndpoints endpoints={[
-{ m: 'GET', p: '/subscriptions' },
-{ m: 'GET', p: '/subscriptions/:id' },
-{ m: 'POST', p: '/subscriptions' },
-{ m: 'PUT', p: '/subscriptions/:id' }
+{ m: 'GET', p: '/v1/subscriptions' },
+{ m: 'GET', p: '/v1/subscriptions/:id' },
+{ m: 'POST', p: '/v1/subscriptions' },
+{ m: 'PUT', p: '/v1/subscriptions/:id' }
 ]} />
 
 <ApiResource data={[
@@ -77,5 +77,3 @@ See the [Retrying](/docs/sending-webhooks/retrying-deliveries) page for more inf
   desc: `The URL where webhooks will be delivered to`
 }
 ]} />
-
-

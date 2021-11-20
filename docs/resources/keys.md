@@ -45,10 +45,10 @@ the algorithm (determined by the `kind` attribute) requires. For the kinds
 ## API
 
 <ApiEndpoints endpoints={[
-{ m: 'GET', p: '/keys' },
-{ m: 'GET', p: '/keys/:id' },
-{ m: 'POST', p: '/keys' },
-{ m: 'PUT', p: '/keys/:id' }
+{ m: 'GET', p: '/v1/keys' },
+{ m: 'GET', p: '/v1/keys/:id' },
+{ m: 'POST', p: '/v1/keys' },
+{ m: 'PUT', p: '/v1/keys/:id' }
 ]} />
 
 <ApiResource data={[
@@ -75,5 +75,3 @@ the algorithm (determined by the `kind` attribute) requires. For the kinds
   endpoint`
 }
 ]} />
-
-

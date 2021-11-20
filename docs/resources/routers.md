@@ -56,10 +56,10 @@ about this.
 ## API
 
 <ApiEndpoints endpoints={[
-{ m: 'GET', p: '/routers' },
-{ m: 'GET', p: '/routers/:id' },
-{ m: 'POST', p: '/routers' },
-{ m: 'PUT', p: '/routers/:id' }
+{ m: 'GET', p: '/v1/routers' },
+{ m: 'GET', p: '/v1/routers/:id' },
+{ m: 'POST', p: '/v1/routers' },
+{ m: 'PUT', p: '/v1/routers/:id' }
 ]} />
 
 <ApiResource data={[
@@ -83,5 +83,3 @@ about this.
   Used for filtering when sending webhooks. See more details above`
 }
 ]} />
-
-
