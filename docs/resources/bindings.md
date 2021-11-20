@@ -3,6 +3,8 @@ sidebar_position: 2
 title: Bindings
 ---
 
+import { ApiEndpoints, ApiResource } from '@site/src/components/ApiDoc';
+
 > This documentation is focused for **webhook receivers** but is also useful for the ones **sending** them!
 
 A Binding connects to a Router object to receive webhooks messages.
@@ -85,5 +87,29 @@ An example response body is as follows:
   ]
 }
 ```
+
+## API
+
+<ApiEndpoints endpoints={[
+{ m: 'GET', p: '/v1/bindings' },
+{ m: 'GET', p: '/v1/bindings/:id' },
+{ m: 'POST', p: '/v1/bindings' },
+{ m: 'GET', p: '/v1/bindings/:id/topics' }
+]} />
+
+<ApiResource data={[
+{
+  attr: "name",
+  type: "string",
+  required: true,
+  desc: "The resource unique name"
+},
+{
+  attr: "router_id",
+  type: "string",
+  required: true,
+  desc: `The ID of the router to bind to`
+}
+]} />
 
 
