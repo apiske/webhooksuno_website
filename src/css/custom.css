@@ -26,3 +26,20 @@
 html[data-theme='dark'] .docusaurus-highlight-code-line {
   background-color: rgba(0, 0, 0, 0.3);
 }
+
+.tiny-info-box::before {
+  content: '?';
+  font-size: 0.7rem;
+  margin-left: 4px;
+}
+
+.tiny-info-box {
+  color: var(--ifm-color-content);
+  display: inline-block;
+  width: 17px;
+  height: 17px;
+  border: 1px solid var(--ifm-color-content);
+  border-radius: 50%;
+  margin-left: 6px;
+  cursor: pointer;
+}

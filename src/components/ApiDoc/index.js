@@ -31,7 +31,9 @@ export function ApiResource({ data }) {
           {d.attr}
           {d.required ? (<strong>*</strong>) : ''}
         </div>
-        <div className={styles.apiresType}>{d.type}</div>
+        <div className={styles.apiresType}>{d.type}{
+          (d.type.indexOf("name|id") >= 0) ? (<a href="/docs/general/api-conventions#resource-ids-and-names" target="_blank" className="tiny-info-box" />) : ''
+        }</div>
 
         <div className={styles.apiresDesc}>{d.desc}</div>
 
