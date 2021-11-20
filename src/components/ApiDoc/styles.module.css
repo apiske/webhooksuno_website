@@ -1,0 +1,87 @@
+
+.apiDocBlock {
+}
+
+.apidocHead {
+  display: flex;
+  flex-direction: row;
+}
+
+.apidocMethod {
+  font-weight: 600;
+  margin-left: 10px;
+  font-size: 1.1rem;
+}
+
+.apidocPath {
+  font-size: 1.1rem;
+  margin-left: 5px;
+}
+
+.conBox {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid black;
+  border-radius: 4px;
+  background-color: var(--ifm-code-background);
+}
+.conBoxTitle {
+  padding: 3px 10px;
+  border-bottom: 1px solid black;
+}
+.conBoxContent {
+  padding: 5px;
+  display: flex;
+  flex-direction: column;
+}
+
+.endpointDef {
+  display: flex;
+  flex-direction: row;
+  padding: 3px 4px;
+  font-family: var(--ifm-font-family-monospace);
+}
+.endpointMethod {
+  font-weight: 600;
+  min-width: 3.4rem;
+}
+.endpointPath {
+}
+
+.apiresBlock {
+  display: flex;
+  flex-direction: column;
+}
+.apiresTitle {
+  padding: 5px 0px;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.apiresRow {
+  display: grid;
+  grid-template-columns: 100px calc(100% - 110px);
+  grid-template-rows: auto;
+  grid-template-areas:
+    "name ."
+    "type ."
+    "desc desc";
+  padding: 5px 0px;
+  border-bottom: 1px solid #ababab;
+}
+
+.apiresName {
+  grid-area: name;
+  font-weight: 600;
+}
+.apiresType {
+  grid-area: type;
+  grid-area: type;
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.7rem;
+}
+.apiresDesc {
+  grid-area: desc;
+  padding: 6px;
+  padding-left: 10px;
+}
