@@ -22,7 +22,7 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
         docs: {
           sidebarPath: require.resolve('./sidebars.js'),
           // Please change this to your repo.
-          editUrl: 'https://github.com/apiske/webhooksuno_doc/edit/main/',
+          editUrl: 'https://github.com/apiske/webhooksuno_website/edit/main/',
         },
         blog: false,
         theme: {
