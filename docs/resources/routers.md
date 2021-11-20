@@ -3,6 +3,8 @@ sidebar_position: 4
 title: Routers
 ---
 
+import { ApiEndpoints, ApiResource } from '@site/src/components/ApiDoc';
+
 > You only need this resource for **sending webhooks**, not for receiving them!
 
 A Router exposes webhook messages and topics to the external world.
@@ -50,3 +52,36 @@ The second a third steps include preconditions (_"if the webhook..."_). If
 the preconditions evaluate to false, the step is considered as passed.
 Please [Using tags](/docs/sending-webhooks/overview#using-tags) section if you are in doubt
 about this.
+
+## API
+
+<ApiEndpoints endpoints={[
+{ m: 'GET', p: '/routers' },
+{ m: 'GET', p: '/routers/:id' },
+{ m: 'POST', p: '/routers' },
+{ m: 'PUT', p: '/routers/:id' }
+]} />
+
+<ApiResource data={[
+{
+  attr: "name",
+  type: "string",
+  required: true,
+  desc: "The resource unique name"
+},
+{
+  attr: "allowed_topics",
+  type: "array[string]",
+  required: true,
+  desc: `A list of topics that this router will route`
+},
+{
+  attr: "tags",
+  type: "array[string]",
+  required: true,
+  desc: `A list of tags associated with this router.
+  Used for filtering when sending webhooks. See more details above`
+}
+]} />
+
+
