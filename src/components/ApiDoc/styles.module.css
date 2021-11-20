@@ -60,7 +60,7 @@
 
 .apiresRow {
   display: grid;
-  grid-template-columns: 150px calc(100% - 160px);
+  grid-template-columns: 200px calc(100% - 210px);
   grid-template-rows: auto;
   grid-template-areas:
     "name ."
