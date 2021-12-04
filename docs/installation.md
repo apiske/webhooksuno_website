@@ -67,7 +67,10 @@ export DATABASE_HOST=uno-db ; \
 export DATABASE_PORT=5432 ; \
 export DATABASE_NAME=uno ; \
 export APP_RJOB_URL="redis://uno-redis:6379/1" ; \
-export APP_RJOB_MAX_THREADS=8
+export APP_RJOB_MAX_THREADS=8 ; \
+export ADMIN_ENABLED=true ; \
+export ADMIN_ALLOW_FROM='0.0.0.0/0,[::]/0' ; \
+export ADMIN_AUTH_TOKEN=secretadmintoken
 ```
 
 ### Initialize the database
@@ -125,6 +128,9 @@ docker run --rm -ti \
   -e DATABASE_NAME=$DATABASE_NAME \
   -e APP_RJOB_URL=$APP_RJOB_URL \
   -e APP_RJOB_MAX_THREADS=$APP_RJOB_MAX_THREADS \
+  -e ADMIN_ENABLED=$ADMIN_ENABLED \
+  -e ADMIN_ALLOW_FROM=$ADMIN_ALLOW_FROM \
+  -e ADMIN_AUTH_TOKEN=$ADMIN_AUTH_TOKEN \
   -p 3005:8080 \
   webhooksuno/webhooksuno:latest api
 ```
@@ -153,45 +159,62 @@ command of the API server:
 
 ### Create workspaces
 
-After having it all running, you won't have any data. That is, you don't
-have API keys to perform calls!
+After having it all running, you won't have any data. You don't
+even have any API keys to perform calls!
 
 To begin playing with webhooks.uno, you will need at least one sender
-account and one receiver workspace.
-As of now, the only way to create a workspace is by running a command
-using docker containers.
+workspace and one receiver workspace.
+To provision workspaces, we will use the [Admin API](/docs/general/admin-api).
 
-The docker command below creates a workspace. It requires you to pass
-a workspace name through the `UNO_WORKSPACE_NAME` environment variable.
-Workspace names must be unique across a webhooks.uno installation.
+The Admin API is served under the `/admin/` prefix and is protected
+by a token. If you've been following the steps above, the token
+should be `secretadmintoken`. It goes along in the `Authorization`
+header like this: `Authorization: Bearer secretadmintoken`.
 
-A workspace can be either used for sending webhooks or for receiving webhooks.
+To start playing with webhooks.uno, you will need at least two workspaces:
+a sender and a receiver. You can create the sender via the following API call:
 
-To create a sender workspace, set the `WORKSPACE_TYPE` environment variable
-to `sender`. To create a receiver workspace, set it to `receiver`.
+(Note: the `http` command refers to the [httpie CLI](https://httpie.io/cli))
 
-For instance, to create a sender workspace named `dummy-sender`, export the variable with:
-
-```
-export UNO_WORKSPACE_NAME=dummy-sender
-export WORKSPACE_TYPE=sender
-```
-
-then run:
-
-```
-docker run --rm -ti \
-  --network uno-net \
-  -e DATABASE_USER=$DATABASE_USER \
-  -e DATABASE_PASSWORD=$DATABASE_PASSWORD \
-  -e DATABASE_HOST=$DATABASE_HOST \
-  -e DATABASE_PORT=$DATABASE_PORT \
-  -e DATABASE_NAME=$DATABASE_NAME \
-  -e APP_RJOB_URL=$APP_RJOB_URL \
-  -e APP_RJOB_MAX_THREADS=$APP_RJOB_MAX_THREADS \
-  -e UNO_WORKSPACE_NAME=$UNO_WORKSPACE_NAME \
-  webhooksuno/webhooksuno:latest create-$WORKSPACE_TYPE
+```shell
+http --json POST http://localhost:3005/admin/workspaces \
+  Authorization:'Bearer secretadmintoken' \
+  data:='{
+    "type": "sender",
+    "name": "dummy-sender"
+  }'
 ```
 
-An API key to access it will be displayed in the output. Copy that key
-as it won't be displayed in the future anymore.
+This will create a sender Workspace named `dummy-sender`.
+The response body will look something like:
+
+```
+{
+  "data": {
+    "api_key": "SRalRn/hldc8NVlMWrUvPaLonH1k2851D0nn/kbS/kuazjK4mtJt2/jAOYtrH/kLvY5UZqnP9HoiDSpW1feDdFd7brH8PtNMX+z+4SCnEqVUY64aBW454IJA2YFa3tjXGsndjxizrr40/ravHlB9HX0AaY67YTOR8vaakj/MlKU=",
+    "id": "69699e68-f0b1-4e3b-bd4c-e8b9cf05d444",
+    "name": "dummy-sender"
+  }
+}
+```
+
+Write down that API Key since it won't be displayed again.
+Use it to authorize with the API endpoints to
+[send webhooks](/docs/sending-webhooks/quick-start).
+
+Now to create a receiver, run the following:
+
+```shell
+http --json POST http://localhost:3005/admin/workspaces \
+  Authorization:'Bearer secretadmintoken' \
+  data:='{
+    "type": "receiver",
+    "name": "dummy-receiver"
+  }'
+```
+
+The response body will be just like the previous one, just with different
+values, of course. You may then use the returned API key to authorize
+with the API endpoints to
+[receive webhooks](/docs/receiving-webhooks/quick-start).
+
